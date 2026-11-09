@@ -4,6 +4,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 from data_preprocessing import x_test, y_test,x_train #imported the testing features and target variable from data_preprocessing.py
 from model_training import best_model #imported the best model from model_training.py
 import pandas as pd #imported pandas to create a dataframe for the evaluation metrics
+from sklearn.inspection import permutation_importance #imported permutation importance from sklearn to evaluate the feature importance of the model
 
 y_hat = trained_pipeline.predict(x_test) #predicting the target variable on the testing features using the trained pipeline
 accuracy = accuracy_score(y_test, y_hat) #calculating the accuracy of the model
@@ -36,10 +37,24 @@ print("Best Model Confusion Matrix:\n", confusion_matrix(y_test, best_y_hat)) #p
 
 best_model_params = best_model.named_steps['model']
 
-print("coefficients:", best_model_params.coef_) #printing the coefficients of the best model
-print("intercept:", best_model_params.intercept_) #printing the intercept of the best model
+#print("coefficients:", best_model_params.coef_) #printing the coefficients of the best model
+#print("intercept:", best_model_params.intercept_) #printing the intercept of the best model
 
-print(x_train.columns) #printing the columns of the training features
+#print(x_train.columns) #printing the columns of the training features
 
 df = pd.DataFrame({"columns": x_train.columns, "coefficients": best_model_params.coef_[0]}) #creating a dataframe with the columns and coefficients of the best model
-print(df) #printing the dataframe with the columns and coefficients of the best model
+#print(df) #printing the dataframe with the columns and coefficients of the best model
+
+premu_importance =  permutation_importance(best_model, x_test, y_test, n_repeats=30, random_state=42) #calculating the permutation importance of the best model
+
+importance_df = pd.DataFrame({"columns": x_train.columns, "importance_mean": premu_importance.importances_mean,"importance_std":premu_importance.importances_std}).sort_values(by='importance_mean',ascending=False) #creating a dataframe with the columns and importance of the best model
+#print(importance_df.head(10)) #printing the dataframe with the columns and importance of the best model
+
+correlation_matrix = x_train.corr() #calculating the correlation matrix of the training features
+condition = (correlation_matrix > 0.7) & (correlation_matrix < 1.0)
+
+found = correlation_matrix.where(condition).reset_index()#finding the pairs of features with correlation greater than 0.8
+
+print(found)
+
+print("Correlation Matrix:\n", correlation_matrix) #printing the correlation matrix of the training features
