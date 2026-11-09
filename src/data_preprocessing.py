@@ -19,7 +19,7 @@ leakage_columns = [
     "koi_score"
 ] #defining columns that might introduce target leakage
 
-X = df_filtered.drop(columns=["koi_disposition", "target"] + leakage_columns) #features for the model by dropping the target and leakage columns
+#X = df_filtered.drop(columns=["koi_disposition", "target"] + leakage_columns) #features for the model by dropping the target and leakage columns
 y = df_filtered["target"] #target variable for the model
 
 #print(X.shape) #printing the shape of the features
@@ -65,15 +65,15 @@ X = X.drop(columns=["koi_tce_delivname"]) #dropping the object type column from 
 #print("Total rows:", len(X)) #printing the total number of rows in the features
 
 
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y) #splitting the data into training and testing sets with 80% training and 20% testing
-#print(x_train.shape)
-#print(x_test.shape)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y) #splitting the data into training and testing sets with 80% training and 20% testing
+#print(X_train.shape)
+#print(X_test.shape)
 #print(y_train.shape)
 #print(y_test.shape)
 
 imputer = SimpleImputer(strategy="median") #creating an instance of simple imputer (median) to fill missing values in features
-X_train_imputed = imputer.fit_transform(x_train) # fitting and tranfroming the training features to fill missing values
-X_test_imputed = imputer.transform(x_test) #transforming the testing features to fill missing values calculated with x_train but we dont caclulate the median of test values to avoid data leakage
+X_train_imputed = imputer.fit_transform(X_train) # fitting and tranfroming the training features to fill missing values
+X_test_imputed = imputer.transform(X_test) #transforming the testing features to fill missing values calculated with X_train but we dont caclulate the median of test values to avoid data leakage
 
 #print(np.isnan(X_train_imputed).sum()) #printing the number of missing values in the training features after imputation
 #print(np.isnan(X_test_imputed).sum()) #printing the number of missing values in the testing features after imputation
