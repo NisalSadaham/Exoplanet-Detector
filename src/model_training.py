@@ -12,6 +12,7 @@ from sklearn.pipeline import Pipeline #importing pipeline from sklearn to create
 model = LogisticRegression(random_state=42) #creating an instance of logistic regression model
 dummy_model = DummyClassifier(strategy='most_frequent', random_state=42) #creating an instance of dummy classifier
 from sklearn.model_selection import cross_val_score #importing cross-validation score from sklearn to evaluate the model using cross-validation
+from sklearn.model_selection import GridSearchCV #imported GridSearchCV from sklearn to perform hyperparameter tuning
 
 model.fit(X_train_scaled, y_train) #fitting the model on the scaled training features and target variable
 dummy_model.fit(X_train_scaled, y_train) #fitting the dummy model on the scaled training features and target variable
@@ -69,3 +70,30 @@ cross_val_scores_3 = cross_val_score(pipeline,X=x_train,y=y_train,cv=skf,scoring
 #print("Standard deviation of cross-validation scores (F1):", cross_val_scores_3.std()) #printing the standard deviation of the cross-validation scores
 
 trained_pipeline = pipeline.fit(x_train, y_train) #fitting the pipeline on the training features and target variable   
+
+param_grid = {
+    "model__C":[0.001, 0.01, 0.1, 1, 10, 100]
+}
+
+grid = GridSearchCV(pipeline, param_grid, cv=skf, scoring='f1') #performing hyperparameter tuning using GridSearchCV with 5-fold cross-validation and accuracy as the scoring metric
+grid.fit(x_train, y_train) #fitting the grid search on the training features and target variable
+best_params = grid.best_params_ #getting the best hyperparameters from the grid search
+best_score = grid.best_score_ #getting the best score from the grid search
+best_estimator = grid.best_estimator_ #getting the best estimator from the grid search
+
+#print("Best Hyperparameters:", best_params) #printing the best hyperparameters from the grid search
+#print("Best Score:", best_score) #printing the best score from the grid search
+#print("Best Estimator:", best_estimator) #printing the best estimator from the grid search
+
+best_model=grid.best_estimator_ #getting the best estimator from the grid search
+
+grid_y_hat = best_model.predict(x_test) #predicting the target variable on the testing features using the best estimator from the grid search
+grid_accuracy = accuracy_score(y_test, grid_y_hat) #calculating the accuracy of the best estimator from the grid search
+grid_precision = precision_score(y_test, grid_y_hat) #calculating the precision of the best estimator from the grid search
+grid_recall = recall_score(y_test, grid_y_hat) #calculating the recall of the best estimator from the grid search
+grid_f1 = f1_score(y_test, grid_y_hat) #calculating the F1 score of the best estimator from the grid search
+
+#print("Grid Search Accuracy:", grid_accuracy) #printing the accuracy of the best estimator from the grid search
+#print("Grid Search Precision:", grid_precision) #printing the precision of the best estimator from the grid search
+#print("Grid Search Recall:", grid_recall) #printing the recall of the best estimator from the grid search
+#print("Grid Search F1 Score:", grid_f1) #printing the F1 score of the best estimator from the grid search
