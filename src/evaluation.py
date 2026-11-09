@@ -44,7 +44,7 @@ best_model_params = best_model.named_steps['model']
 df = pd.DataFrame({"columns": X_train.columns, "coefficients": best_model_params.coef_[0]}) #creating a dataframe with the columns and coefficients of the best model
 #print(df) #printing the dataframe with the columns and coefficients of the best model
 
-permutation_result =  permutation_importance(best_model, X_test, y_test, n_repeats=30, random_state=42) #calculating the permutation importance of the best model
+permutation_result = permutation_importance(best_model, X_test, y_test, n_repeats=30, random_state=42) #calculating the permutation importance of the best model
 
 importance_df = pd.DataFrame({"columns": X_train.columns, "importance_mean": permutation_result.importances_mean,"importance_std":permutation_result.importances_std}).sort_values(by='importance_mean',ascending=False) #creating a dataframe with the columns and importance of the best model
 #print(importance_df.head(10)) #printing the dataframe with the columns and importance of the best model
